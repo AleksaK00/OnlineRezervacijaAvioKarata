@@ -1,0 +1,158 @@
+﻿@model RezultatPretrage
+
+@{
+    ViewData["Title"] = "Pretraga | ";
+}
+
+<section class="container">
+
+    <div class="row">
+
+        <div class="col-md-12 mt-4">
+            <h1 class="text-center display-5">Pretražite dostupne letove brzo i jednostavno!</h1>
+        </div>
+
+        @* Searchbar *@
+        <div class="navbar bg-primary col-md-12 mt-2 mb-2">
+
+            <div class="container-fluid justify-content-center">
+                <form class="d-flex" asp-controller="Search" asp-action="Pretraga" name="formaPretraga" id="formaPretraga">
+                    <input class="form-control me-2" name="polazniAerodrom" type="search" placeholder="Polazni aerodrom" aria-label="PolazniAerodrom">
+                    <input class="form-control me-2" name="dolazniAerodrom" type="search" placeholder="Dolazni aerodrom" aria-label="DolazniAerodrom">
+                    <button type="submit" class="btn btn-primary" name="pretraga">Pretraži</button>
+                </form>
+            </div>
+        </div>
+
+        @* Provera da li je vracena greska ili nema rezultata pre nego sto se ispisuju rezultati *@
+        @if ((string?)ViewData["Greska"] != "")
+        {
+            <div class="col-md-12 p-5 bg-white border border-primary mt-2 rounded-3">
+                <p class="display-6 text-center">@ViewData["Greska"]</p>
+            </div>
+        }
+        else if (Model.RezultatiPretrage.Count == 0)
+        {
+            <div class="col-md-12 p-5 bg-white border border-primary mt-2 rounded-3">
+                <p class="display-6 text-center">Nema Letova između dva grada</p>
+            </div>
+        }
+        else
+        {
+            <!-- Kreiranje div-a sa filterima upisanim u podaciZaFilter -->
+                <div class="col-md-12 p-3 bg-white border border-primary rounded-4 mb-4">
+                    <div class="row">
+                        <div class="col-md-3"></div>
+                        <div class="col-md-6">
+                            <h3 class="text-center">Filteri</h3>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-secondary d-flex ms-auto" onclick="ResetujFiltere(); Filter(); SliderIspis()">Reset</button>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <!-- Filter za avio kompanije -->
+                        <div class="col-md-3 form-group text-center">
+                            <form name="formaFilterAvioKompanija" id="formaFilterAvioKompanija">
+                            <label for="filterAvioKompanije" class="form-label lead">Avio kompanija:</label>
+                            <select id="filterAvioKompanije" name="filterAvioKompanije" class="form-select text-center border border-primary" onchange="Filter()">
+                                <option value="">Sve</option>
+                                @foreach (AvioKompanijaBO avioKompanija in Model.AvioKompanije)
+                                {
+                                    <option value="@avioKompanija.IcaoKod">@avioKompanija.Ime</option>
+                                }
+                            </select>
+                            </form>
+                        </div>
+
+                        <!-- Filter za polazni aerodrom -->
+                        <div class="col-md-3 form-group text-center">
+                            <form name="formaFilterPolazniAerodrom" id="formaFilterPolazniAerodrom">
+                                <label for="filterPolazniAerodrom" class="form-label lead">Polazni aerodrom:</label>
+                                <select id="filterPolazniAerodrom" name="filterPolazniAerodrom" class="form-select text-center border border-primary" onchange="Filter()">
+                                    <option value="">Svi</option>
+                                    @foreach (AerodromBO aerodrom in Model.PolazniAerodromi)
+                                    {
+                                        <option value="@aerodrom.Ime">@aerodrom.Ime</option>
+                                    }
+                                </select>
+                            </form>
+                        </div>
+
+                        <!-- Filter za dolazni aerodrom -->
+                        <div class="col-md-3 form-group text-center">
+                            <form name="formaFilterDolazniAerodrom" id="formaFilterDolazniAerodrom">
+                                <label for="filterDolazniAerodrom" class="form-label lead">Dolazni aerodrom:</label>
+                                <select id="filterDolazniAerodrom" name="filterDolazniAerodrom" class="form-select text-center border border-primary" onchange="Filter()">
+                                    <option value="">Svi</option>
+                                @foreach (AerodromBO aerodrom in Model.DolazniAerodromi)
+                                {
+                                    <option value="@aerodrom.Ime">@aerodrom.Ime</option>
+                                }
+                                </select>
+                            </form>
+                        </div>
+
+                        <!-- Filter za cenu -->
+                        <div class="col-md-3 form-group text-center">
+                            <form name="formaFilterCena" id="formaFilterCena">
+                                <label id="labelaFilterCena" for="filterCena" class="form-label lead">Cena do:</label>
+                                <input name="filterCena" id="filterCena" type="range" class="form-range" min="@Model.MinCena"
+                                       max="@(Model.MaxCena + 1)" onchange="Filter(); SliderIspis()" value="@(Model.MaxCena + 1)">
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
+            <!-- Ispis svake pretrage u card komponenti bootstrapa -->
+            foreach(PojedinacniRezultat rezultat in Model.RezultatiPretrage)
+            {
+                <div class="card mb-3 rounded-4 border-primary resultcard" data-AvioKompanija="@rezultat.AvioKompanija.IcaoKod" data-PolazniAerodrom="@rezultat.PolazniAerodrom.Ime"
+                     data-DolazniAerodrom="@rezultat.DolazniAeordrom.Ime" data-Cena="@rezultat.CenaOd">
+                    <div class="row g-0">
+
+                        <div class="col-md-2">
+                            <img src="~/images/AirlineLogos/@(rezultat.AvioKompanija.IcaoKod + ".png")" class="img-fluid rounded-start" alt="@rezultat.AvioKompanija.Ime logo">
+                        </div>
+
+                        <div class="col-md-10">
+
+                            <div class="card-body">
+                                <h3 class="card-title text-center">@(rezultat.PolazniAerodrom.Grad + " - " + rezultat.DolazniAeordrom.Grad)</h3>
+                                <br>
+                                <p class="card-text text-center">Kompanija: <b>@rezultat.AvioKompanija.Ime</b>. Broj Leta: @rezultat.Let.BrLeta <b>@(rezultat.PolazniAerodrom.Ime + " - " + rezultat.DolazniAeordrom.Ime)</b></p>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h4 class="card-text display-5 mt-3">OD: @rezultat.CenaOd.ToString("C", ViewBag.Culture)</h4>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h4 class="card-text display-5 mt-3">@rezultat.Let.VremePolaska h</h4>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <!-- link koji prosledjuje broj leta stranici za rezervaciju -->
+                                        <a href="" class="btn btn-secondary btn-lg mt-3">Rezerviši</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+  
+        }
+    </div>
+</section>
+
+@* Parcijalni pogled sa promocijama *@
+<partial name="~/Views/Home/Promocije.cshtml" model="@ViewData["Promocije"]" />
+
+@* Javascript *@
+@section Scripts
+{
+    <script src="~/js/ResultFilters.js"></script>
+    <script src="~/js/elementClickActions.js"></script>
+}
