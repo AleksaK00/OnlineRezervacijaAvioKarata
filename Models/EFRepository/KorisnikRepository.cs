@@ -63,5 +63,103 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
             }
         }
 
+        public KorisnikBO? getByEmail(string email)
+        {
+            KorisnikBO korisnikBo = new KorisnikBO();
+
+            //Pretraga korisnika u bazi
+            Korisnik? korisnik = (from k in rezervacijaEntities.Korisniks
+                                  where k.Email == email
+                                  select k).SingleOrDefault();
+
+            //Popunjavanje biznis objekta ukoliko korisnik postoji
+            if (korisnik == null)
+            {
+                return null;
+            }
+            else
+            {
+                korisnikBo.IdKorisnika = korisnik.IdKorisnika;
+                korisnikBo.KorisnickoIme = korisnik.KorisnickoIme;
+                korisnikBo.Email = korisnik.Email;
+                korisnikBo.Ime = korisnik.Ime;
+                korisnikBo.Prezime = korisnik.Prezime;
+                korisnikBo.Adresa = korisnik.Adresa;
+                korisnikBo.Administrator = korisnik.Administrator;
+                korisnikBo.PasswordResetToken = korisnik.PasswordResetToken;
+                korisnikBo.PasswordResetTimestamp = korisnik.PasswordResetTimestamp;
+                korisnikBo.IsDeleted = korisnik.IsDeleted;
+
+                return korisnikBo;
+            }
+        }
+
+        //Proverava da li je neki drugi korisnik zauzeo korisnicko ime
+        public bool ckeckUsernameAvailability(string email, string korisnickoIme)
+        {
+            //Pretraga korisnika u bazi
+            Korisnik? korisnik = (from k in rezervacijaEntities.Korisniks
+                                  where k.Email != email && k.KorisnickoIme == korisnickoIme
+                                  select k).SingleOrDefault();
+
+            if (korisnik == null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        //Dodaje novog korisnika
+        public void add(KorisnikBO noviKorisnik, string sifra)
+        {
+            Korisnik korisnik = new Korisnik();
+
+            //Hash koriscenjem MD5 algoritma
+            byte[] bitHash = MD5.HashData(Encoding.UTF8.GetBytes(sifra));
+            string hexHash = Convert.ToHexString(bitHash);
+
+            //Unosenje informacija
+            korisnik.KorisnickoIme = noviKorisnik.KorisnickoIme;
+            korisnik.Sifra = hexHash;
+            korisnik.Email = noviKorisnik.Email;
+            korisnik.Ime = noviKorisnik.Ime;
+            korisnik.Prezime = noviKorisnik.Prezime;
+            korisnik.Adresa = noviKorisnik.Adresa;
+            korisnik.Administrator = 0;
+            korisnik.PasswordResetToken = null;
+            korisnik.PasswordResetTimestamp = null;
+            korisnik.IsDeleted = null;
+
+            rezervacijaEntities.Korisniks.Add(korisnik);
+            rezervacijaEntities.SaveChangesAsync();
+        }
+
+        public void edit(KorisnikBO noviKorisnik, string sifra)
+        {
+            Korisnik korisnik = (from k in rezervacijaEntities.Korisniks
+                                 where k.Email == noviKorisnik.Email
+                                 select k).Single();
+
+            //Hash koriscenjem MD5 algoritma
+            byte[] bitHash = MD5.HashData(Encoding.UTF8.GetBytes(sifra));
+            string hexHash = Convert.ToHexString(bitHash);
+
+            //Unosenje informacija
+            korisnik.KorisnickoIme = noviKorisnik.KorisnickoIme;
+            korisnik.Sifra = hexHash;
+            korisnik.Ime = noviKorisnik.Ime;
+            korisnik.Prezime = noviKorisnik.Prezime;
+            korisnik.Adresa = noviKorisnik.Adresa;
+            korisnik.Administrator = 0;
+            korisnik.PasswordResetToken = null;
+            korisnik.PasswordResetTimestamp = null;
+            korisnik.IsDeleted = null;
+
+            rezervacijaEntities.Korisniks.Update(korisnik);
+            rezervacijaEntities.SaveChangesAsync();
+        }
     }
 }

@@ -29,8 +29,13 @@ namespace OnlineRezervacijaAvioKarata.Controllers
             return PartialView("Promocije", _promocijaRepository.GetActive());
         }
 
-        public IActionResult Privacy()
+        //Pogled stranice sa obavestenjima, potrebna poruka se prenosi po zavrsetku drugih akcija po potrebi
+        public IActionResult MessagePage(string poruka, string dugmePoruka, string kontroler, string akcija)
         {
+            ViewData["Poruka"] = poruka;
+            ViewData["DugmePoruka"] = dugmePoruka;
+            ViewData["Kontroler"] = kontroler;
+            ViewData["Akcija"] = akcija;
             return View();
         }
 
