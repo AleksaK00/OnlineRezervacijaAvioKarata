@@ -28,13 +28,13 @@ namespace OnlineRezervacijaAvioKarata.Controllers
         {
             RezultatPretrage rezultatPretrage = new RezultatPretrage();
             ViewData["Promocije"] = _promocijaRepository.GetActive();
-            ViewData["Greska"] = "Primer";
+            ViewData["Greska"] = "";
             return View("Index", rezultatPretrage);
         }
 
         //Metoda koja vrsi pretragu na osnovu unesenih podataka za polazni i dolazni grad
         [HttpPost]
-        public IActionResult Pretraga(string polazniAerodrom, string dolazniAerodrom)
+        public IActionResult Index(string polazniAerodrom, string dolazniAerodrom)
         {
             RezultatPretrage rezultatPretrage = new RezultatPretrage();
             ViewData["Promocije"] = _promocijaRepository.GetActive();

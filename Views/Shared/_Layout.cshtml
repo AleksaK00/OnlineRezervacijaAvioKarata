@@ -24,22 +24,22 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         @* Ispis naloga u slucaju da je ulogovan, opcija za register/log in u slucaju da nije *@
-                        @if(false)
+                        @if(!string.IsNullOrEmpty(Context.Request.Cookies["Korisnik"]))
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index"></a>
+                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">@Context.Request.Cookies["Korisnik"]</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Odjavite se</a>
+                                <a class="nav-link" asp-area="" asp-controller="Login" asp-action="Odjava">Odjavite se</a>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Prijavite se</a>
+                                <a class="nav-link" asp-area="" asp-controller="Login" asp-action="Index">Prijavite se</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Registeracija</a>
+                                <a class="nav-link" asp-area="" asp-controller="Register" asp-action="Index">Registeracija</a>
                             </li>
                         }            
                     </ul>
