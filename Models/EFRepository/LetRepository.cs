@@ -32,5 +32,27 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
 
             return letoviBO;
         }
+
+        public LetBO? GetByFlightNumber(string brLeta)
+        {
+            Let? letIzBaze = rezervacijaEntities.Lets.Where(l => l.BrLeta == brLeta).FirstOrDefault();
+
+            LetBO? noviLet = new LetBO();
+
+            if (letIzBaze != null)
+            {
+                noviLet.BrLeta = letIzBaze.BrLeta;
+                noviLet.PolazniAerodrom = letIzBaze.PolazniAerodrom;
+                noviLet.DolazniAerodrom = letIzBaze.DolazniAerodrom;
+                noviLet.IcaoKod = letIzBaze.IcaoKod;
+                noviLet.VremePolaska = letIzBaze.VremePolaska;
+
+                return noviLet;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

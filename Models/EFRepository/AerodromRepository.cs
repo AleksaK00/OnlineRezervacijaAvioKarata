@@ -30,5 +30,25 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
 
             return aerodromiBO;
         }
+
+        public AerodromBO? GetByICAOkod(string ICAOkod)
+        {
+            Aerodrom? aerodromIzBaze = rezervacijaEntities.Aerodroms.Where(a => a.IcaoKodAerodroma == ICAOkod).FirstOrDefault();
+
+            if (aerodromIzBaze == null)
+            {
+                return null;
+            }
+            else
+            {
+                AerodromBO noviAeordrom = new AerodromBO();
+                noviAeordrom.IcaoKodAerodroma = aerodromIzBaze.IcaoKodAerodroma;
+                noviAeordrom.Grad = aerodromIzBaze.Grad;
+                noviAeordrom.Ime = aerodromIzBaze.Ime;
+                noviAeordrom.Drzava = aerodromIzBaze.Drzava;
+
+                return noviAeordrom;
+            }
+        }
     }
 }

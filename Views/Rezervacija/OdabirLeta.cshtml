@@ -1,0 +1,55 @@
+﻿@model List<InstancaLetaBO>
+
+@{
+	ViewData["Title"] = "Odabir leta | ";
+}
+
+<section class="container">
+        <div class="row mt-5 gx-4">    
+            @* Navigaciona traka koja prikazuje korake rezervacije i omogucava vracanje nazad *@
+            <partial name="Navigacija" model="ViewBag.SideNavData"></partial>
+
+
+            @* Polje sa tabelama za prikaz dostupnih datuma za let i cenom klasa *@
+            <div class="col-md-9 px-5 py-4 bg-white border border-primary rounded-4">
+
+                <h3 class="text-center">Dostupni letovi kompanije <b class="text-primary">@ViewBag.AvioKompanija.Ime</b> za let <b class="text-primary">@ViewBag.Let</b></h3>
+
+                <div class="table-responsive mt-4">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Datum Polaska</th>
+                                <th>Ekonomija</th>
+                                <th>Premium ekonomija</th>
+                                <th>Biznis</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                            @foreach (InstancaLetaBO let in Model)
+                            {
+                            <tr>
+                                <td>@let.DatumPolaska</td>
+                                <td>@Convert.ToDouble(let.CenaEkonomija).ToString("C", ViewBag.Culture)</td>
+                                <td>@(let.CenaPremiumEkonomija > 0 ? Convert.ToDouble(let.CenaPremiumEkonomija).ToString("C", ViewBag.Culture) : "Nije Dostupna")</td>
+                                <td>@(let.CenaBiznis > 0 ? Convert.ToDouble(let.CenaBiznis).ToString("C", ViewBag.Culture) : "Nije Dostupna")</td>
+                                <td><a class="btn btn-secondary btn-md" asp-controller="Rezervacija" asp-action="OdaberiKlasu" asp-route-brLeta="@let.BrLeta" asp-route-datumPolaska="@let.DatumPolaska">Izaberi</a></td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    @* forma sa sesijom o pretrazenoj destinaciji, vraca na pretragu *@
+                    <div class="text-center"> 
+                        <form asp-controller="Search" asp-action="Index">
+                            <input type="hidden" value="@Context.Session.GetString("PolazniAerodrom")" name="polazniAerodrom" />
+                            <input type="hidden" value="@Context.Session.GetString("DolazniAerodrom")" name="dolazniAerodrom" />
+                            <input type="submit" value="Nazad" class="btn btn-secondary btn-lg mt-1"/>
+                        </form>
+                    </div>
+
+                </div>
+            </div> 
+        </div>
+    </section>

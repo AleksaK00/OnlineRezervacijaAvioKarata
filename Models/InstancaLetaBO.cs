@@ -22,8 +22,8 @@
 
         public string? BenefitiBiznis { get; set; }
 
-        public virtual Let Let { get; set; } = null!;
+        public virtual LetBO Let { get; set; } = null!;
 
-        public virtual Avion RegistracijaNavigation { get; set; } = null!;
+        public virtual AvionBO RegistracijaNavigation { get; set; } = null!;
     }
 }

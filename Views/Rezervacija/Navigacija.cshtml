@@ -1,0 +1,33 @@
+﻿@model SideNavData
+
+<div class="col-md-3">
+    <nav class="navbar navbar-expand-lg bg-primary">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="nav flex-column w-100">
+                    <li class="nav-item">
+                        <a class="nav-link fs-4 @((Context.Request.Path == ("/Rezervacija/IzaberiLet/" + Model.BrLeta)) ? "rounded-3 active" : "")"
+                           asp-controller="Rezervacija" asp-action="IzaberiLet" asp-route-id="@Model.BrLeta">Datum polaska</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-4 @((Context.Request.Path == ("/Rezervacija/OdaberiKlasu/" + Model.BrLeta + "/" + Model.DatumPolaska)) ? "rounded-3 active" : "")
+                           @((Model.Korak < 2) ? "disabled" : "")"
+                            href="">Klasa i sedište</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-4 
+                           @((Model.Korak < 3) ? "disabled" : "")"
+                            href="">Unos informacija</a>
+                    </li>
+                    <li class="nav-item">
+                        <div class="nav-link fs-4
+                             @((Model.Korak < 4) ? "disabled" : "")">Potvrda</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>

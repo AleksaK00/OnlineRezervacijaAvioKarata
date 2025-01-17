@@ -1,0 +1,20 @@
+﻿@model InstancaLetaBO
+
+<section class="container">
+    <div class="row mt-5 gx-4">
+        @* Navigaciona traka koja prikazuje korake rezervacije i omogucava vracanje nazad *@
+        <partial name="Navigacija" model="ViewBag.SideNavData"></partial>
+
+        <div class="col-md-9 px-2 py-4 bg-white border border-primary rounded-4">
+
+            @* Ispis dostupnih klasa, njihove cene i njihovih benefita *@
+            <h3 class="text-center">Odaberi klasu</h3>
+
+            <div class="row">
+
+                <partial name="KarticeZaKlasu" model="Model"></partial>
+
+            </div>
+        </div>
+    </div>
+</section>

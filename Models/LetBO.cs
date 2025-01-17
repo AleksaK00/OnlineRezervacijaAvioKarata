@@ -12,10 +12,10 @@
 
         public TimeOnly VremePolaska { get; set; }
 
-        public virtual Aerodrom DolazniAerodromNavigation { get; set; } = null!;
+        public virtual AerodromBO DolazniAerodromNavigation { get; set; } = null!;
 
-        public virtual AvioKompanija IcaoKodNavigation { get; set; } = null!;
+        public virtual AvioKompanijaBO IcaoKodNavigation { get; set; } = null!;
 
-        public virtual Aerodrom PolazniAerodromNavigation { get; set; } = null!;
+        public virtual AerodromBO PolazniAerodromNavigation { get; set; } = null!;
     }
 }
