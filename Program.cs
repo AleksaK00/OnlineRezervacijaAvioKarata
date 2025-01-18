@@ -40,6 +40,9 @@ app.UseAuthorization();
 app.UseSession();
 
 app.MapControllerRoute(
+    name: "odabirKarata",
+    pattern: "{controller=Home}/{action=Index}/{brLeta}/{datumPolaska}/{klasa}");
+app.MapControllerRoute(
     name: "odabirKlase",
     pattern: "{controller=Home}/{action=Index}/{brLeta}/{datumPolaska}");
 app.MapControllerRoute(

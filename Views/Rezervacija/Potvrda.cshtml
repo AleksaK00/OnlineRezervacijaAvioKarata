@@ -1,0 +1,96 @@
+﻿@model InstancaLetaBO
+
+@{
+	ViewData["Title"] = "Potvrda rezervacija | ";
+}
+
+<section class="container">
+
+    <div class="row mt-5 gx-4">
+
+        @* Navigaciona traka koja prikazuje korake rezervacije i omogucava vracanje nazad *@
+        <partial name="Navigacija" model="ViewBag.SideNavData"></partial>
+
+        <div class="col-md-9 px-4 py-4 bg-white border border-primary rounded-4">
+
+            <h3 class="text-center">Pregled Rezervacije</h3>
+
+            @* Ispis bitnih podataka o rezervaciji u tabeli *@
+            <div class="table-responsive">
+                <table class="table mt-3 display-6">
+                    <tr>
+                        <td class="text-primary">Avio Kompanija:</td>
+                        <td>@ViewBag.AvioKompanija.Ime</td>
+                    </tr>
+                    <tr>
+                        <td class="text-primary">Broj Leta:</td>
+                        <td>@Model.BrLeta</td>
+                    </tr>
+                    <tr>
+                        <td class="text-primary">Datum Polaska:</td>
+                        <td>@Model.DatumPolaska</td>
+                    </tr>
+                    <tr>
+                        <td class="text-primary">Klasa:</td>
+                        <td>@ViewBag.SideNavData.Klasa</td>
+                    </tr>
+                    <tr>
+                        <td class="text-primary">Broj karata:</td>
+                        <td>@Context.Session.GetString("BrKarata")</td>
+                    </tr>
+                    <tr>
+                        <td class="text-primary">Cena: </td>
+                        <td>@((Convert.ToDouble(Context.Session.GetString("CenaKarte")) * Convert.ToInt32(Context.Session.GetString("BrKarata"))).ToString("C", ViewBag.Culture))</td>
+                    </tr>
+                    <tr>
+                        <td class="text-primary">Izabrana Sedista: </td>
+                        <td>
+                            @foreach (var sediste in ViewBag.Sedista)
+                            {
+                                @if (!string.IsNullOrEmpty(sediste))
+                                {
+                                    @(sediste + " ")
+                                }
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-primary">Cena Doplate: </td>
+                        <td>@Convert.ToDouble(Context.Session.GetString("CenaDoplate")).ToString("C", ViewBag.Culture)</td>
+                    </tr>
+                    <tr>
+                        <td class="text-primary">Ime: </td>
+                        <td>@ViewBag.Ime</td>
+                    </tr>
+                    <tr>
+                        <td class="text-primary">Prezime: </td>
+                        <td>@ViewBag.Prezime</td>
+                    </tr>
+                    <tr>
+                        <td class="text-primary">Adresa: </td>
+                        <td>@ViewBag.Adresa</td>
+                    </tr>
+                </table>
+
+                @* Ispis ukupne cene *@
+                <h3 class="display-5 text-center mt-5">Ukupno: @((Convert.ToDouble(Context.Session.GetString("CenaKarte")) * Convert.ToInt32(Context.Session.GetString("BrKarata")) + Convert.ToDouble(Context.Session.GetString("CenaDoplate"))).ToString("C", ViewBag.Culture))</h3>
+            </div>
+
+            @* Forma sa hidden inputima koje sadrze informacije potrebne za tabale rezervacije, naloga, i rezervisanih sedista uz one koje se nalaze u sesiji *@
+            <div class="text-center">
+                <form>
+                    <input type="hidden" name="brLeta" value="@Model.BrLeta">
+                    <input type="hidden" name="datumPolaska" value="@Model.DatumPolaska">
+                    <input type="hidden" name="ICAO_Kod" value="@Model.IcaoKod">
+                    <input type="hidden" name="klasa" value="@ViewBag.SideNavData.Klasa">
+                    <input type="hidden" name="ime" value="@ViewBag.Ime">
+                    <input type="hidden" name="prezime" value="@ViewBag.Prezime">
+                    <input type="hidden" name="adresa" value="@ViewBag.Adresa">
+                    <input type="hidden" name="registracija" value=@Model.Registracija>
+                    <input type="submit" class="btn btn-secondary btn-lg mt-5" name="rezervisi" value="Rezerviši let">
+                </form>
+            </div>
+
+        </div>
+    </div>
+</section>

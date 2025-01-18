@@ -1,0 +1,51 @@
+﻿@model KorisnikBO
+
+@{
+    ViewData["Title"] = " Informacije | ";
+}
+
+<section class="container">
+    <div class="row mt-5 gx-4">  
+
+        @* Navigaciona traka koja prikazuje korake rezervacije i omogucava vracanje nazad *@
+        <partial name="Navigacija" model="ViewBag.SideNavData"></partial>
+
+        <div class="col-md-9 px-2 py-4 bg-white border border-primary rounded-4">
+
+            <h3 class="text-center">Unesi/Potvrdi informacije</h3>
+
+            <div class="row justify-content-center">
+                <div class="col-md-6"> 
+
+                    <form asp-controller="Rezervacija" asp-action="PrikaziPotvrduRezervacije" asp-route-brLeta="@ViewBag.SideNavData.BrLeta" asp-route-datumPolaska="@ViewBag.SideNavData.DatumPolaska" asp-route-klasa="@ViewBag.SideNavData.Klasa">
+                        <div class="mb-3">
+                            <label for="ime" class="form-label">Ime</label>
+                            <input type="text" class="form-control" id="ime" name="ime" value="@Model.Ime"/>
+                        </div>
+                        <div class="mb-3">
+                            <label for="prezime" class="form-label">Prezime</label>
+                            <input type="text" class="form-control" id="prezime" name="prezime" value="@Model.Prezime"/>
+                        </div>
+                        <div class="mb-3">
+                            <label for="adresa" class="form-label">Prezime</label>
+                            <input type="text" class="form-control" id="adresa" name="adresa" value="@Model.Adresa"/>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-secondary btn-lg mt-3 mb-3">Potvrdi</button>
+                        </div>
+                    </form>
+
+                    <!-- Obavestenje o greskama unosa -->
+                    @if (ViewData["Greska"] != null)
+                    {
+                        <div class="text-bg-danger text-center mb-2 p-2 rounded-4">
+                            @ViewData["Greska"]
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>

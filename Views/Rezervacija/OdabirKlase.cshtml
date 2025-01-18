@@ -15,6 +15,71 @@
                 <partial name="KarticeZaKlasu" model="Model"></partial>
 
             </div>
+
+            @* Drugi odeljak ispisuje se iskljucivo ako je korisnik odabrao klasu *@
+            @if (!string.IsNullOrEmpty(ViewBag.Klasa))
+            {
+                <div class="row border-top border-primary py-4 px-2 m-4">
+
+                    @* Korisnik bira broj karata, max 5, a zatim mu se prikazuje opcija za rezervaciju sedista, i to onoliko select-ova koliko je izabrao karata *@
+                    <div class="col-md-8 mt-5" id="odabir" data-Cena = "@ViewBag.Cena">
+                        <form asp-controller="Rezervacija" asp-action="IspisInformacija" asp-route-brLeta="@Model.BrLeta" asp-route-datumPolaska="@Model.DatumPolaska" asp-route-klasa="@ViewBag.Klasa">
+                            <div class="row justify-content-center">
+                                <div class="col-md-12 text-center">
+
+                                    <label for="brojKarata" class="lead">Izaberite broj Karata</label>
+                                    <input class="form-control w-50 ms-auto me-auto" type="number" id="brojKarata" name="brojKarata" value="1" min="1" max="5" onchange="IzracunajCenu(); PrikaziRezervacijuSedista();">
+                                    <p class="display-6 mt-4" id="ispisCene">Cena: @Convert.ToDouble(ViewBag.Cena).ToString("C", ViewBag.Culture)</p>
+
+                                    <div class="border-top border-primary p-3 mt-5">
+
+                                        @for(int i = 1; i <= 5; i++)
+                                        {
+                                            <div class="row mb-3" id="sediste@(i)div"  style="@(i == 1 ? "" : "display: none;")">
+                                                <div class="col-md-8">
+                                                    <h4>Rezervišite sedište @(i == 1 ? "" : "karte " + i):</h4>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <select class="form-select" id="sediste@(i)" name="sediste@(i)" onchange="IzracunajDoplatu(); OnemoguciDupliOdabir();">
+                                                        <option value="" data-Doplata="0">Ne rezevišem</option>
+                                                        @foreach (SedisteBO sediste in ViewBag.Sedista)
+                                                        {
+                                                            @if (sediste.Klasa == ViewBag.Klasa)
+                                                            {
+                                                                <option value="@sediste.BrSedista" data-Doplata="@sediste.Doplata">@sediste.BrSedista</option>
+                                                            }
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        }
+                                        <h4 class="display-6 mt-5" id="doplataSedista"></h4>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row tex-center">
+                                <input type="hidden" name="cenaKarte" value="@ViewBag.Cena">
+                                <input type="hidden" name="cenaDoplate" id="cenaDoplate" value="0">
+                                <input type="submit" class="btn btn-secondary btn-lg mt-5" value="Izaberi">
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="col-md-4">
+                        <img src="~/images/SeatConfigurations/@(Model.IcaoKod + ViewBag.Avion).png"/>
+                    </div>
+
+                </div>
+
+                @* Javascript *@
+                @section Scripts
+                {
+                    <script src="~/js/reservationActions.js"></script>
+                }
+
+            }
         </div>
     </div>
 </section>
+

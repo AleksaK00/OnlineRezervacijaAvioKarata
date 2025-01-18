@@ -5,6 +5,7 @@ using OnlineRezervacijaAvioKarata.Filters;
 using OnlineRezervacijaAvioKarata.Models;
 using OnlineRezervacijaAvioKarata.Models.EFRepository;
 using System.Globalization;
+using System.Text.Json;
 
 namespace OnlineRezervacijaAvioKarata.Controllers
 {
@@ -15,6 +16,9 @@ namespace OnlineRezervacijaAvioKarata.Controllers
         private AvioKompanijaRepository _avioKompanijaRepository;
         private AerodromRepository _aerodromRepository;
         private LetRepository _letRepository;
+        private RezervacijaRepository _rezervacijaRepository;
+        private AvionRepository _avionRepository;
+        private KorisnikRepository _korisnikRepository;
 
         public RezervacijaController()
         {
@@ -22,6 +26,9 @@ namespace OnlineRezervacijaAvioKarata.Controllers
             _avioKompanijaRepository = new AvioKompanijaRepository();
             _aerodromRepository = new AerodromRepository();
             _letRepository = new LetRepository();
+            _rezervacijaRepository = new RezervacijaRepository();
+            _avionRepository = new AvionRepository();
+            _korisnikRepository = new KorisnikRepository();
         }
 
         //Parcijalni pogled za navigaciju procesa rezervacije
@@ -110,6 +117,166 @@ namespace OnlineRezervacijaAvioKarata.Controllers
         public IActionResult KarticeZaKlasu()
         {
             return PartialView("KarticeZaKlasu");
+        }
+
+        //Metoda koja vraca informacije za odaber karte i rezervaciju sedista, koristi isti pogled kao odabirKlase
+        public IActionResult OdabirKarata(string brLeta, DateOnly datumPolaska, string klasa)
+        {
+            InstancaLetaBO? instancaLeta = _instancaLetaRepository.GetExactInstance(brLeta, datumPolaska);
+
+            //Obavestenje o ne postojanju leta ukoliko ne postoji, zatim formatiranje teksta o benefitima za html
+            if (instancaLeta == null)
+            {
+                return RedirectToAction("MessagePage", "Home", new { poruka = "Nismo pronasli let!", dugmePoruka = "Nazad na početnu", kontroler = "Home", akcija = "Index" });
+            }
+            instancaLeta.BenefitiEkonomija = instancaLeta.BenefitiEkonomija.Replace("\\r\\n", "<br>");
+            instancaLeta.BenefitiPremiumEkonomija = instancaLeta.BenefitiPremiumEkonomija.Replace("\\r\\n", "<br>");
+            instancaLeta.BenefitiBiznis = instancaLeta.BenefitiBiznis.Replace("\\r\\n", "<br>");
+
+            //Informacije za navigaciju
+            SideNavData nav = new SideNavData
+            {
+                BrLeta = brLeta,
+                DatumPolaska = datumPolaska,
+                Klasa = klasa,
+                Korak = 2
+            };
+            ViewBag.SideNavData = nav;
+
+            //Hvatanje nerezervisanih sedista, vracanje modela aviona i odabrane klase
+            ViewBag.Klasa = klasa;
+            ViewBag.Sedista = _rezervacijaRepository.GetUnreservedSeatsForFlight(brLeta, datumPolaska);
+            AvionBO? avion = _avionRepository.getByRegistration(instancaLeta.Registracija);
+            ViewBag.Avion = avion.Model;
+
+            //Stavljanje odabrane cene odabrane klase u viewBag za ispisivanje cene na stranici
+            switch(klasa)
+            {
+                case "Ekonomija": 
+                    ViewBag.Cena = instancaLeta.CenaEkonomija;
+                    break;
+                case "PremiumEkonomija":
+                    ViewBag.Cena = instancaLeta.CenaPremiumEkonomija;
+                    break;
+                case "Biznis":
+                    ViewBag.Cena = instancaLeta.CenaBiznis;
+                    break;
+            }
+            //Dodavanje popusta ukoliko postoji
+            if (HttpContext.Request.Cookies["PopustZa"] == instancaLeta.BrLeta)
+            {
+                ViewBag.Cena = ViewBag.Cena * 0.9;
+            }
+
+            //Format za ispisivanje cene
+            CultureInfo culture = new CultureInfo("fr-FR");
+            ViewBag.Culture = culture;
+
+            return View("OdabirKlase", instancaLeta);
+        }
+
+        //Metoda koja uzima podatke za klasu, karte i sedista koji je korisnik upisao, cuva sta je potrebno u sesiju, i daje licen podatke za potvrdi/promenu
+        [HttpPost]
+        public IActionResult IspisInformacija(string brLeta, DateOnly datumPolaska, string klasa, IFormCollection podaci)
+        {
+            //Postavljanje informacija u sesiju
+            int brKarata = Convert.ToInt32(podaci["brojKarata"]);
+            List<string> izabranaSedista = new List<string>();
+            for (int i = 1; i <= brKarata; i++)
+            {
+                if (podaci["sediste" + i] != "")
+                {
+                    izabranaSedista.Add(podaci["sediste" + i]);
+                }          
+            }
+            HttpContext.Session.SetString("Sedista", JsonSerializer.Serialize(izabranaSedista));
+            HttpContext.Session.SetString("BrKarata", brKarata.ToString());
+            HttpContext.Session.SetString("CenaKarte", podaci["cenaKarte"]);
+            HttpContext.Session.SetString("CenaDoplate", podaci["cenaDoplate"]);
+
+            //Informacije za navigaciju
+            SideNavData nav = new SideNavData
+            {
+                BrLeta = brLeta,
+                DatumPolaska = datumPolaska,
+                Klasa = klasa,
+                Korak = 3
+            };
+            ViewBag.SideNavData = nav;
+
+            //Uzimanje podataka o ulogovanom korisniku
+            KorisnikBO korisnik = _korisnikRepository.getByUsername(HttpContext.Request.Cookies["Korisnik"]);
+
+            return View("IspisInformacija", korisnik);
+        }
+
+        //Get verzija metode za navigaciju nazad i ispis gresaka
+        [HttpGet]
+        public IActionResult IspisInformacija(string brLeta, DateOnly datumPolaska, string klasa, string greska)
+        {
+            //Informacije za navigaciju
+            SideNavData nav = new SideNavData
+            {
+                BrLeta = brLeta,
+                DatumPolaska = datumPolaska,
+                Klasa = klasa,
+                Korak = 3
+            };
+            ViewBag.SideNavData = nav;
+            ViewData["Greska"] = greska;
+
+            //Uzimanje podataka o ulogovanom korisniku
+            KorisnikBO korisnik = _korisnikRepository.getByUsername(HttpContext.Request.Cookies["Korisnik"]);
+
+            return View("IspisInformacija", korisnik);
+        }
+
+        //Metoda za ispis stranice o potvrdi rezervacije
+        [HttpPost]
+        public IActionResult PrikaziPotvrduRezervacije(string brLeta, DateOnly datumPolaska, string klasa, IFormCollection podaci)
+        {
+            //Validacija da li su polja uneta i vracanje greske ako nisu
+            if (String.IsNullOrEmpty(podaci["ime"]) || String.IsNullOrEmpty(podaci["prezime"]) || String.IsNullOrEmpty(podaci["adresa"]))
+            {
+                return RedirectToAction("IspisInformacija", new { brLeta = brLeta, datumPolaska = datumPolaska, klasa = klasa, greska = "Sva polja su obavezna!" });
+            }
+
+            //Skladistenje podataka iz forme za ispis
+            ViewBag.Ime = podaci["ime"];
+            ViewBag.Prezime = podaci["prezime"];
+            ViewBag.Adresa = podaci["adresa"];
+
+            //Preuzimanja nekih podataka o letu koji korisniku sluze dobar pregled podataka o rezervaciji
+            InstancaLetaBO instancaLeta = _instancaLetaRepository.GetExactInstance(brLeta, datumPolaska);
+            KorisnikBO korisnik = _korisnikRepository.getByUsername(HttpContext.Request.Cookies["Korisnik"]);
+            AvioKompanijaBO avioKompanija = _avioKompanijaRepository.GetByICAOkod(instancaLeta.IcaoKod);
+            ViewBag.Korisnik = korisnik;
+            ViewBag.AvioKompanija = avioKompanija;
+
+            //Lokalizacija valute
+            CultureInfo culture = new CultureInfo("fr-FR");
+            ViewBag.Culture = culture;
+
+            //Deserializacija liste sedista iz sesije za ispis
+            List<string> sedista = new List<string>();
+            var sedistaSession = HttpContext.Session.GetString("Sedista");
+            if (!string.IsNullOrEmpty(sedistaSession))
+            {
+                sedista = JsonSerializer.Deserialize<List<string>>(HttpContext.Session.GetString("Sedista"));
+            }    
+            ViewBag.Sedista = sedista;
+
+            //Informacije za navigaciju
+            SideNavData nav = new SideNavData
+            {
+                BrLeta = brLeta,
+                DatumPolaska = datumPolaska,
+                Klasa = klasa,
+                Korak = 4
+            };
+            ViewBag.SideNavData = nav;
+
+            return View("Potvrda", instancaLeta);
         }
     }
 }
