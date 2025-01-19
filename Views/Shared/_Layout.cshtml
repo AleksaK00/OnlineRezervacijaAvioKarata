@@ -27,19 +27,19 @@
                         @if(!string.IsNullOrEmpty(Context.Request.Cookies["Korisnik"]))
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">@Context.Request.Cookies["Korisnik"]</a>
+                                <a class="nav-link" asp-controller="Account" asp-action="Index">@Context.Request.Cookies["Korisnik"]</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Login" asp-action="Odjava">Odjavite se</a>
+                                <a class="nav-link" asp-controller="Login" asp-action="Odjava">Odjavite se</a>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Login" asp-action="Index">Prijavite se</a>
+                                <a class="nav-link" asp-controller="Login" asp-action="Index">Prijavite se</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Register" asp-action="Index">Registeracija</a>
+                                <a class="nav-link" asp-controller="Register" asp-action="Index">Registeracija</a>
                             </li>
                         }            
                     </ul>

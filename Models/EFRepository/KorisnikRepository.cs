@@ -161,5 +161,16 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
             rezervacijaEntities.Korisniks.Update(korisnik);
             rezervacijaEntities.SaveChangesAsync();
         }
+
+        //Metoda koja gasi nalog postavljanjem Is_Deleted kolone na 1
+        public void ShutDownAcount(KorisnikBO korisnikBO)
+        {
+            Korisnik korisnikIzBaze = rezervacijaEntities.Korisniks.Where(k => k.IdKorisnika == korisnikBO.IdKorisnika).FirstOrDefault();
+
+            korisnikIzBaze.IsDeleted = 1;
+
+            rezervacijaEntities.Korisniks.Update(korisnikIzBaze);
+            rezervacijaEntities.SaveChanges();
+        }
     }
 }

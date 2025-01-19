@@ -27,6 +27,18 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
             rezervacijaEntities.SaveChanges();
         }
 
+        //Metoda za otkazivanje rezervacije. Takodje brise sva rezervisana sedista vezana za rezervaciju
+        public void CancelReservation(RezervacijaBO rezervacijaBO)
+        {
+            Rezervacija rezervacijaIzBaze = rezervacijaEntities.Rezervacijas.Where(r => r.IdKorisnika == rezervacijaBO.IdKorisnika && r.BrLeta == rezervacijaBO.BrLeta && r.DatumPolaska == rezervacijaBO.DatumPolaska).Include(r => r.Sedistes).FirstOrDefault();
+
+            rezervacijaIzBaze.Otkazana = 1;
+            rezervacijaIzBaze.Sedistes.Clear();
+
+            rezervacijaEntities.Rezervacijas.Update(rezervacijaIzBaze);
+            rezervacijaEntities.SaveChanges();
+        }
+
         //Metoda koja vraca rezervaciju na osnovu njenog primarnog kljuca
         public RezervacijaBO? GetReservation(string brLeta, DateOnly datumPolaska, int IDkorisnika)
         {
@@ -43,6 +55,7 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
                     BrLeta = rezervacijaIzBaze.BrLeta,
                     DatumPolaska = rezervacijaIzBaze.DatumPolaska,
                     IdKorisnika = rezervacijaIzBaze.IdKorisnika,
+                    IcaoKod = rezervacijaIzBaze.IcaoKod,
                     BrKarata = rezervacijaIzBaze.BrKarata,
                     Klasa = rezervacijaIzBaze.Klasa,
                     Ime = rezervacijaIzBaze.Ime,
@@ -54,6 +67,34 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
 
                 return rezervacija;
             }
+        }
+
+        //Metoda koja vraca sve rezervacije korisnika
+        public IEnumerable<RezervacijaBO> getReservationsByUserID(int IDkorisnika)
+        {
+            List<RezervacijaBO> rezervacije = new List<RezervacijaBO>();
+
+            foreach (Rezervacija rezervacijaIzBaze in rezervacijaEntities.Rezervacijas.Where(r => r.IdKorisnika == IDkorisnika).Include(r => r.Sedistes).ToList())
+            {
+                RezervacijaBO novaRezervacija = new RezervacijaBO()
+                {
+                    IdKorisnika = rezervacijaIzBaze.IdKorisnika,
+                    BrLeta = rezervacijaIzBaze.BrLeta,
+                    DatumPolaska = rezervacijaIzBaze.DatumPolaska,
+                    IcaoKod = rezervacijaIzBaze.IcaoKod,
+                    Klasa = rezervacijaIzBaze.Klasa,
+                    BrKarata = rezervacijaIzBaze.BrKarata,
+                    Ime = rezervacijaIzBaze.Ime,
+                    Prezime = rezervacijaIzBaze.Prezime,
+                    Adresa = rezervacijaIzBaze.Adresa,
+                    Otkazana = rezervacijaIzBaze.Otkazana,
+                    Sedistes = rezervacijaIzBaze.Sedistes
+                };
+
+                rezervacije.Add(novaRezervacija);
+            }
+
+            return rezervacije;
         }
 
         //Hvata sva nerezervisana sedista na letu

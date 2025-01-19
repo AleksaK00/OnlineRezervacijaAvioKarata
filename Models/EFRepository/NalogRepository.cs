@@ -21,5 +21,30 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
             rezervacijaEntities.Add(nalog);
             rezervacijaEntities.SaveChanges();
         }
+
+        //Metoda hvata nalog za placanje rezervacije
+        public NalogBO? GetForReservation(RezervacijaBO rezervacijaBO)
+        {
+            Nalog nalogIzBaze = rezervacijaEntities.Nalogs.Where(n => n.IdKorisnika == rezervacijaBO.IdKorisnika && n.BrLeta == rezervacijaBO.BrLeta && n.DatumPolaska == rezervacijaBO.DatumPolaska).FirstOrDefault();
+
+            if (nalogIzBaze == null)
+            {
+                return null;
+            }
+            else
+            {
+                NalogBO nalog = new NalogBO()
+                {
+                    IdNaloga = nalogIzBaze.IdNaloga,
+                    BrLeta = nalogIzBaze.BrLeta,
+                    DatumPolaska = nalogIzBaze.DatumPolaska,
+                    IcaoKod = nalogIzBaze.IcaoKod,
+                    IdKorisnika = nalogIzBaze.IdKorisnika,
+                    Iznos = nalogIzBaze.Iznos
+                };
+
+                return nalog;
+            }
+        }
     }
 }

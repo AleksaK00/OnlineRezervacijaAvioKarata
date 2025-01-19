@@ -1,0 +1,104 @@
+﻿@model List<UserFriendlyRezervacija>
+
+@{
+	ViewData["Title"] = "Pregled rezervacija | ";
+}
+
+<section class="container">
+
+    @* Navigaciona traka *@
+    <partial name="NavigacijaNalog"></partial>
+
+    <div class="row mt-3">
+        <div class="col-md-12 px-4 py-4 bg-white border border-primary rounded-3">
+
+            <h2 class="display-5 text-center">Istorija rezervacija</h2>
+
+            @* Tabela koja ispisuje relevantne informacije o rezervaciji *@
+            <div class="table-responsive mt-4">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Avio Kompanija</th>
+                            <th>Broj leta</th>
+                            <th>Vreme Polaska</th>
+                            <th>Datum Polaska</th>
+                            <th>Polazni Aerodrom</th>
+                            <th>Dolazni Aerodrom</th>
+                            <th>Klasa</th>
+                            <th>Cena</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                        @foreach (UserFriendlyRezervacija rezervacija in Model)
+                        {
+                            <tr>
+                                <td>@rezervacija.ImeKompanije</td>
+                                <td>@rezervacija.Rezervacija.BrLeta</td>
+                                <td>@rezervacija.VremePolaska</td>
+                                <td>@rezervacija.Rezervacija.DatumPolaska</td>
+                                <td>@rezervacija.PolazniAerodrom</td>
+                                <td>@rezervacija.DolazniAerodrom</td>
+                                <td>@rezervacija.Rezervacija.Klasa</td>
+                                <td>@rezervacija.Iznos.ToString("C", ViewBag.Culture)</td>
+                                <td>
+                                    @* Ispisivanja statusa rezervacije *@
+                                    @if (rezervacija.Rezervacija.Otkazana == 1)
+                                    {
+                                        <span class="text-danger"><b>Otkazana</b></span>
+                                    }
+                                    else if (rezervacija.DanaDO.Days < 0)
+                                    {
+                                        <span class="text-success"><b>Ispunjena</b></span>
+                                    }
+                                    else if (rezervacija.DanaDO.Days == 0)
+                                    {
+                                        <span class="text-info"><b>Danas! Srećan put</b></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-primary"><b>Za @rezervacija.DanaDO.Days dana</b></span>
+                                    }
+                                </td>
+                                <td><button class="btn btn-secondary @((rezervacija.Rezervacija.Otkazana == 1 || rezervacija.DanaDO.Days <= 0) ? "disabled" : "")" type="button" data-bs-toggle="modal" data-bs-target="#potvrdaOtkazivanja"
+                                            onclick="RezervacijaZaBrisanje('@(rezervacija.Rezervacija.BrLeta)', '@(rezervacija.Rezervacija.DatumPolaska)', '@(rezervacija.IDkorisnika)');">
+                                        Otkaži
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Modal za potvrdu otkazivanja -->
+            <div class="modal fade" id="potvrdaOtkazivanja" tabindex="-1" aria-labelledby="potvrdaOtkazivanja" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="ModalLabel">Potvrdi brisanje</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Da li ste sigurni da želite da obrišete nalog?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Nazad</button>
+                            <a class="btn btn-danger" href="" id="otkazi">Otkaži</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+@* Javascript *@
+@section Scripts
+{
+    <script src="~/js/accountActions.js"></script>
+}
