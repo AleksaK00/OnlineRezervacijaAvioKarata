@@ -7,6 +7,55 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
     {
         private OnlineRezervacijaKarataContext rezervacijaEntities = new OnlineRezervacijaKarataContext();
 
+        //Metoda koja dodaje rezervaciju u bazu
+        public void Add(RezervacijaBO rezervacijaBO)
+        {
+            Rezervacija rezervacija = new Rezervacija()
+            {
+                BrLeta = rezervacijaBO.BrLeta,
+                IcaoKod = rezervacijaBO.IcaoKod,
+                DatumPolaska = rezervacijaBO.DatumPolaska,
+                IdKorisnika = rezervacijaBO.IdKorisnika,
+                BrKarata = rezervacijaBO.BrKarata,
+                Ime = rezervacijaBO.Ime,
+                Prezime = rezervacijaBO.Prezime,
+                Adresa = rezervacijaBO.Adresa,
+                Klasa = rezervacijaBO.Klasa
+            };
+
+            rezervacijaEntities.Rezervacijas.Add(rezervacija);
+            rezervacijaEntities.SaveChanges();
+        }
+
+        //Metoda koja vraca rezervaciju na osnovu njenog primarnog kljuca
+        public RezervacijaBO? GetReservation(string brLeta, DateOnly datumPolaska, int IDkorisnika)
+        {
+            Rezervacija? rezervacijaIzBaze = rezervacijaEntities.Rezervacijas.Where(r => r.BrLeta == brLeta && r.DatumPolaska == datumPolaska && r.IdKorisnika == IDkorisnika).Include(r => r.Sedistes).FirstOrDefault();
+
+            if (rezervacijaIzBaze == null)
+            {
+                return null;
+            }
+            else
+            {
+                RezervacijaBO rezervacija = new RezervacijaBO()
+                {
+                    BrLeta = rezervacijaIzBaze.BrLeta,
+                    DatumPolaska = rezervacijaIzBaze.DatumPolaska,
+                    IdKorisnika = rezervacijaIzBaze.IdKorisnika,
+                    BrKarata = rezervacijaIzBaze.BrKarata,
+                    Klasa = rezervacijaIzBaze.Klasa,
+                    Ime = rezervacijaIzBaze.Ime,
+                    Prezime = rezervacijaIzBaze.Prezime,
+                    Adresa = rezervacijaIzBaze.Adresa,
+                    Otkazana = rezervacijaIzBaze.Otkazana,
+                    Sedistes = rezervacijaIzBaze.Sedistes
+                };
+
+                return rezervacija;
+            }
+        }
+
         //Hvata sva nerezervisana sedista na letu
         public IEnumerable<SedisteBO> GetUnreservedSeatsForFlight(string brLeta, DateOnly datumPolaska)
         {
@@ -50,6 +99,23 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
             }
 
             return nerezervisanaSedista;
+        }
+
+        //Metoda koja rezervise sedista no osnovu liste broja sedista i datog aviona, za datu rezervaciju
+        public void ReserveSeats(List<string> sedista, string registracija, RezervacijaBO rezervacijaBO)
+        {
+            //Pronalazenje rezervacije u bazi
+            Rezervacija rezervacijaIzBaze = rezervacijaEntities.Rezervacijas.Where(r => r.BrLeta == rezervacijaBO.BrLeta && r.DatumPolaska == rezervacijaBO.DatumPolaska && r.IdKorisnika == rezervacijaBO.IdKorisnika).Include(r => r.Sedistes).FirstOrDefault();
+
+            //Dodavanje sedista u tabelu relacije vise na vise
+            foreach (string brojSedista in sedista)
+            {
+                Sediste sediste = rezervacijaEntities.Sedistes.Where(s => s.BrSedista == brojSedista && s.Registracija == registracija).FirstOrDefault();
+                rezervacijaIzBaze.Sedistes.Add(sediste);
+            }
+
+            rezervacijaEntities.Update(rezervacijaIzBaze);
+            rezervacijaEntities.SaveChanges();
         }
     }
 }

@@ -25,5 +25,7 @@
         public virtual KorisnikBO IdKorisnikaNavigation { get; set; } = null!;
 
         public virtual InstancaLetaBO InstancaLetum { get; set; } = null!;
+
+        public virtual ICollection<Sediste> Sedistes { get; set; } = new List<Sediste>();
     }
 }

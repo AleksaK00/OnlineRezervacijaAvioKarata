@@ -78,7 +78,7 @@
 
             @* Forma sa hidden inputima koje sadrze informacije potrebne za tabale rezervacije, naloga, i rezervisanih sedista uz one koje se nalaze u sesiji *@
             <div class="text-center">
-                <form>
+                <form asp-controller="Rezervacija" asp-action="Rezervisi" asp-route-brLeta="@Model.BrLeta" asp-route-datumPolaska="@Model.DatumPolaska" asp-route-klasa="@ViewBag.SideNavData.Klasa">
                     <input type="hidden" name="brLeta" value="@Model.BrLeta">
                     <input type="hidden" name="datumPolaska" value="@Model.DatumPolaska">
                     <input type="hidden" name="ICAO_Kod" value="@Model.IcaoKod">

@@ -19,6 +19,7 @@ namespace OnlineRezervacijaAvioKarata.Controllers
         private RezervacijaRepository _rezervacijaRepository;
         private AvionRepository _avionRepository;
         private KorisnikRepository _korisnikRepository;
+        private NalogRepository _nalogRepository;
 
         public RezervacijaController()
         {
@@ -29,6 +30,7 @@ namespace OnlineRezervacijaAvioKarata.Controllers
             _rezervacijaRepository = new RezervacijaRepository();
             _avionRepository = new AvionRepository();
             _korisnikRepository = new KorisnikRepository();
+            _nalogRepository = new NalogRepository();
         }
 
         //Parcijalni pogled za navigaciju procesa rezervacije
@@ -277,6 +279,61 @@ namespace OnlineRezervacijaAvioKarata.Controllers
             ViewBag.SideNavData = nav;
 
             return View("Potvrda", instancaLeta);
+        }
+
+        //Metoda za kreiranje rezervacije, rezervisanih sedista i naloga
+        [HttpPost]
+        public IActionResult Rezervisi(string brLeta, DateOnly datumPolaska, string klasa, IFormCollection podaci)
+        {
+            //Provera da li korisnik vec ima rezervaciju za let
+            KorisnikBO korisnik = _korisnikRepository.getByUsername(HttpContext.Request.Cookies["Korisnik"]);
+            RezervacijaBO? rezervacijaProvera = _rezervacijaRepository.GetReservation(brLeta, datumPolaska, korisnik.IdKorisnika);
+            if (rezervacijaProvera != null)
+            {
+                return RedirectToAction("MessagePage", "Home", new { poruka = "Već imate rezervaciju za let, maksimalno 1 rezervacija po letu!", dugmePoruka = "Nazad na početnu", kontroler = "Home", akcija = "Index" });
+            }
+
+            //Kreiranje Biznis objekta rezervacije i dodavanje u bazu podataka
+            string brojKarata = HttpContext.Session.GetString("BrKarata");
+            RezervacijaBO rezervacija = new RezervacijaBO()
+            {
+                DatumPolaska = datumPolaska,
+                BrLeta = brLeta,
+                IcaoKod = podaci["ICAO_Kod"],
+                IdKorisnika = korisnik.IdKorisnika,
+                Klasa = klasa,
+                Ime = podaci["ime"],
+                Prezime = podaci["prezime"],
+                Adresa = podaci["adresa"],
+                BrKarata = Convert.ToInt32(brojKarata)
+            };
+            _rezervacijaRepository.Add(rezervacija);
+
+            //Kreiranje biznis objekta za nalog i dodavanje u bazu podataka
+            string cenaKarte = HttpContext.Session.GetString("CenaKarte");
+            string cenaDoplate = HttpContext.Session.GetString("CenaDoplate");
+            double ukupnaCena = Convert.ToInt32(brojKarata) * Convert.ToDouble(cenaKarte) + Convert.ToDouble(cenaDoplate);
+            NalogBO nalog = new NalogBO()
+            {
+                BrLeta = rezervacija.BrLeta,
+                DatumPolaska = rezervacija.DatumPolaska,
+                IcaoKod = rezervacija.IcaoKod,
+                IdKorisnika = rezervacija.IdKorisnika,
+                Iznos = ukupnaCena
+            };
+            _nalogRepository.Add(nalog);
+
+            //Rezervacija sedista ukoliko su izabrana
+            List<string> sedista = new List<string>();
+            var sedistaSession = HttpContext.Session.GetString("Sedista");
+            if (!string.IsNullOrEmpty(sedistaSession))
+            {
+                sedista = JsonSerializer.Deserialize<List<string>>(HttpContext.Session.GetString("Sedista"));
+            }
+            InstancaLetaBO instancaLeta = _instancaLetaRepository.GetExactInstance(brLeta, datumPolaska);
+            _rezervacijaRepository.ReserveSeats(sedista, instancaLeta.Registracija, rezervacija);
+
+            return RedirectToAction("MessagePage", "Home", new { poruka = "Uspešna rezervacija!", dugmePoruka = "Nazad na početnu", kontroler = "Home", akcija = "Index" });
         }
     }
 }
