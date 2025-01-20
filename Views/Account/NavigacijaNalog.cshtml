@@ -16,7 +16,8 @@
                            asp-controller="Account" asp-action="PregledRezervacija">Rezervacije</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link">Izmeni informacije</a>
+                        <a class="nav-link @((Context.Request.Path == ("/Account/PromenaInformacija")) ? "rounded-3 active" : "")"
+                           asp-controller="Account" asp-action="PromenaInformacija">Izmeni informacije</a>
                     </li>
                 </ul>
             </div>

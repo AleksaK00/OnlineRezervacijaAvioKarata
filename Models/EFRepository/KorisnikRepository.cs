@@ -95,11 +95,29 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
         }
 
         //Proverava da li je neki drugi korisnik zauzeo korisnicko ime
-        public bool ckeckUsernameAvailability(string email, string korisnickoIme)
+        public bool checkUsernameAvailability(string email, string korisnickoIme)
         {
             //Pretraga korisnika u bazi
             Korisnik? korisnik = (from k in rezervacijaEntities.Korisniks
                                   where k.Email != email && k.KorisnickoIme == korisnickoIme
+                                  select k).SingleOrDefault();
+
+            if (korisnik == null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        //Proverava da li je email vec u upotrebi u nekom drugom nalogu
+        public bool checkEmailAvailability(string email, string korisnickoIme)
+        {
+            //Pretraga korisnika u bazi
+            Korisnik? korisnik = (from k in rezervacijaEntities.Korisniks
+                                  where k.Email == email && k.KorisnickoIme != korisnickoIme
                                   select k).SingleOrDefault();
 
             if (korisnik == null)
@@ -168,6 +186,98 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
             Korisnik korisnikIzBaze = rezervacijaEntities.Korisniks.Where(k => k.IdKorisnika == korisnikBO.IdKorisnika).FirstOrDefault();
 
             korisnikIzBaze.IsDeleted = 1;
+
+            rezervacijaEntities.Korisniks.Update(korisnikIzBaze);
+            rezervacijaEntities.SaveChanges();
+        }
+
+        //Metoda koja menja licne informacije korisnika
+        public void EditPersonalInfo(KorisnikBO korisnikBO, string ime, string prezime, string adresa)
+        {
+            Korisnik korisnikIzBaze = rezervacijaEntities.Korisniks.Where(k => k.IdKorisnika == korisnikBO.IdKorisnika).FirstOrDefault();
+
+            korisnikIzBaze.Ime = ime;
+            korisnikIzBaze.Prezime = prezime;
+            korisnikIzBaze.Adresa = adresa;
+
+            rezervacijaEntities.Korisniks.Update(korisnikIzBaze);
+            rezervacijaEntities.SaveChanges();
+        }
+
+        //Metoda za promenu korisnickog imena
+        public void EditUsername(KorisnikBO korisnikBO, string korisnickoIme)
+        {
+            Korisnik korisnikIzBaze = rezervacijaEntities.Korisniks.Where(k => k.IdKorisnika == korisnikBO.IdKorisnika).FirstOrDefault();
+
+            korisnikIzBaze.KorisnickoIme = korisnickoIme;
+
+            rezervacijaEntities.Korisniks.Update(korisnikIzBaze);
+            rezervacijaEntities.SaveChanges();
+        }
+
+        //Metoda koja menja email korisnika
+        public void EditEmail(KorisnikBO korisnikBO, string email)
+        {
+            Korisnik korisnikIzBaze = rezervacijaEntities.Korisniks.Where(k => k.IdKorisnika == korisnikBO.IdKorisnika).FirstOrDefault();
+
+            korisnikIzBaze.Email = email;
+
+            rezervacijaEntities.Korisniks.Update(korisnikIzBaze);
+            rezervacijaEntities.SaveChanges();
+        }
+
+        //Metoda cuva kod za resetovanje sifre i vreme kad je kod zatrazen
+        public void StoreResetCode(KorisnikBO korisnikBO, string kod)
+        {
+            Korisnik korisnikIzBaze = rezervacijaEntities.Korisniks.Where(k => k.IdKorisnika == korisnikBO.IdKorisnika).FirstOrDefault();
+
+            //Hash koriscenjem MD5 algoritma
+            byte[] bitHash = MD5.HashData(Encoding.UTF8.GetBytes(kod));
+            string hexHash = Convert.ToHexString(bitHash);
+
+            //Cuvanje u bazu
+            korisnikIzBaze.PasswordResetToken = hexHash;
+            korisnikIzBaze.PasswordResetTimestamp = DateTime.Now;
+
+            rezervacijaEntities.Korisniks.Update(korisnikIzBaze);
+            rezervacijaEntities.SaveChanges();
+        }
+
+        //Metoda za proveru ispravnosti reset koda
+        public bool CheckResetCode(KorisnikBO korisnikBO, string kod)
+        {
+            Korisnik korisnikIzBaze = rezervacijaEntities.Korisniks.Where(k => k.IdKorisnika == korisnikBO.IdKorisnika).FirstOrDefault();
+            TimeSpan petMinuta = new TimeSpan(0, 5, 0);
+
+            //Hash koriscenjem MD5 algoritma
+            byte[] bitHash = MD5.HashData(Encoding.UTF8.GetBytes(kod));
+            string hexHash = Convert.ToHexString(bitHash);
+
+            //Provera da li se hashovi koda podudaraju, i da li je kod stariji od 5 minuta
+            if (korisnikIzBaze.PasswordResetToken == hexHash && korisnikIzBaze.PasswordResetTimestamp >= DateTime.Now.Subtract(petMinuta))
+            {
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
+
+        }
+
+        //Metoda za promenu sifre
+        public void EditPassword(KorisnikBO korisnikBO, string sifra)
+        {
+            Korisnik korisnikIzBaze = rezervacijaEntities.Korisniks.Where(k => k.IdKorisnika == korisnikBO.IdKorisnika).FirstOrDefault();
+
+            //Hash koriscenjem MD5 algoritma
+            byte[] bitHash = MD5.HashData(Encoding.UTF8.GetBytes(sifra));
+            string hexHash = Convert.ToHexString(bitHash);
+
+            //Promena sifre i resetovanje tokena za promenu sifre
+            korisnikIzBaze.Sifra = hexHash;
+            korisnikIzBaze.PasswordResetToken = null;
+            korisnikIzBaze.PasswordResetTimestamp = null;
 
             rezervacijaEntities.Korisniks.Update(korisnikIzBaze);
             rezervacijaEntities.SaveChanges();

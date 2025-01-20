@@ -1,0 +1,54 @@
+﻿@{
+	ViewData["Title"] = "Promena sifre | ";
+}
+
+<section class="container">
+
+    @* Navigaciona traka *@
+    <partial name="NavigacijaNalog"></partial>
+
+    <div class="row mt-3">
+        <div class="col-md-12 px-4 py-4 bg-white border border-primary rounded-3">
+
+            <h2 class="display-6 text-center">Promena šifre</h2>
+
+            <form name="registrationForm" asp-controller="Account" asp-action="PromenaSifre">
+                <div class="row mb-3 justify-content-center">
+                    <div class="col-md-3" id="lozinkaDiv">
+                        <label for="lozinkaPolje" class="form-label">Lozinka</label>
+                        <input id="lozinkaPolje" class="form-control" type="password" name="password" oninput="KvalitetSifre()" onfocus="KvalitetSifre()">
+                    </div>
+                </div>
+
+                <div class="row mb-3 justify-content-center">
+                    <div class="col-md-3" id="lozinkaPotvrdaDiv">
+                        <label for="lozinkaPotvrdaPolje" class="form-label">Potvrdi Lozinku</label>
+                        <input id="lozinkaPotvrdaPolje" class="form-control" type="password" name="password_confirm" oninput="UporediSifru()" onfocus="UporediSifru()">
+                    </div>
+                </div>
+
+                <div class="row mb-3 text-center justify-content-center">
+                    <div class="col-md-3">
+                        <input class="btn btn-secondary btn-lg" type="submit" name="potvrdi" value="Promeni šifru">
+                    </div>
+                </div>
+            </form>
+
+            @* Ispisivanje gresaka unosa *@
+            @if (ViewData["Greska"] != null)
+            {
+                <div class="text-bg-danger text-center mb-2 p-2 rounded-4">
+                    @ViewData["Greska"]
+                </div>
+            }
+
+        </div>
+    </div>
+
+</section>
+
+@* Javascript *@
+@section Scripts
+{
+    <script src="~/js/formValidation.js"></script>
+}

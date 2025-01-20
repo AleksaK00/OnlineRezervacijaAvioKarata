@@ -1,6 +1,6 @@
-function RezervacijaZaBrisanje(brLeta, datumPolaska, IDkorisnika)
+function RezervacijaZaBrisanje(brLeta, datumPolaska)
 {
-    document.getElementById('otkazi').href = '/reservation/' + brLeta + '/' + datumPolaska + '/' + IDkorisnika + '/cancel'; 
+    document.getElementById('otkazi').href = '/Account/OtkaziRezervaciju/' + brLeta + '/' + datumPolaska; 
 }
 
 //Za prikazivanje i sakrivanje osnovnih informacija

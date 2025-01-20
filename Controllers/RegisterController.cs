@@ -55,7 +55,7 @@ namespace OnlineRezervacijaAvioKarata.Controllers
                 if (korisnikEmail.IsDeleted == 1)
                 {
                     //Proverava da li je neki drugi korisnik vec zauzeo korisnicko ime, azurira i aktivira nalog ako nije
-                    if (_korisnikRepository.ckeckUsernameAvailability(podaci["email"], podaci["username"]))
+                    if (_korisnikRepository.checkUsernameAvailability(podaci["email"], podaci["username"]))
                     {
                         KorisnikBO azuriraniKorisnik = new KorisnikBO();
                         azuriraniKorisnik.KorisnickoIme = podaci["username"];

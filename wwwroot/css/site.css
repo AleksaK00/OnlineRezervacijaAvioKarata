@@ -19,7 +19,7 @@
     color: #ffffff;
 }
 
-    .navbar-brand:hover{
+    .navbar-brand:hover {
         color: blanchedalmond;
     }
 
@@ -31,6 +31,7 @@
     .nav-link:hover {
         color: #ffffff !important;
         background-color: #f5622c !important;
+        border-radius: .5rem !important;
     }
 /* .nav-link:visited
 {
