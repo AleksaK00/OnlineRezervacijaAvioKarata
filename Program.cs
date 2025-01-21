@@ -9,6 +9,7 @@ builder.Services.AddControllersWithViews();
 
 //Custom filteri za autorizaciju
 builder.Services.AddScoped<LoginRequiredFilter>();
+builder.Services.AddScoped<AdminRequiredFilter>();
 
 //session
 builder.Services.AddDistributedMemoryCache();

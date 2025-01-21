@@ -1,0 +1,120 @@
+﻿@model List<AdminPogledRezervacija>
+
+@{
+	ViewData["Title"] = "Pregled rezervacija | ";
+}
+
+<section class="container">
+
+    @* Navigaciona traka *@
+    <partial name="NavigacijaAdmin"></partial>
+
+    <div class="row mt-3">
+        <div class="col-md-12 px-4 py-4 bg-white border border-primary rounded-3">
+
+            @* Searchbar *@
+            <div class="navbar bg-primary col-md-12 mt-1">
+
+                <div class="container-fluid">
+                    <form class="d-flex" name="formaPretraga" id="formaPretraga" asp-controller="Admin" asp-action="PretraziRezervacije">
+                        <input class="form-control me-2" name="pretragaPolje" type="search" placeholder="" aria-label="Pretraga">
+                        <button type="submit" class="btn btn-primary" name="pretraga">Pretraži</button>
+                    </form>
+                </div>
+            </div>
+
+            @* Ispisivanje gresaka unosa *@
+            @if (ViewData["Greska"] != null)
+            {
+                <div class="text-bg-danger text-center my-2 p-2 rounded-4">
+                    @ViewData["Greska"]
+                </div>
+            }
+
+            @* Ispis Rezervacija *@
+            <div class="table-responsive mt-4">
+                <table class="table table-hover align-middle">
+
+                    <tr>
+                        <th>Korisnicko ime</th>
+                        <th>Broj Leta</th>
+                        <th>Datum</th>
+                        <th>Broj karata</th>
+                        <th>Klasa</th>
+                        <th>Ime</th>
+                        <th>Prezime</th>
+                        <th>Adresa</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+
+                    @foreach(AdminPogledRezervacija rezervacija in Model)
+                    {
+                        <tr>
+                            <td>@rezervacija.KorisnickoIme</td>
+                            <td>@rezervacija.Rezervacija.BrLeta</td>
+                            <td>@rezervacija.Rezervacija.DatumPolaska</td>
+                            <td>@rezervacija.Rezervacija.BrKarata</td>
+                            <td>@rezervacija.Rezervacija.Klasa</td>
+                            <td>@rezervacija.Rezervacija.Ime</td>
+                            <td>@rezervacija.Rezervacija.Prezime</td>
+                            <td>@rezervacija.Rezervacija.Adresa</td>
+                            <td>
+                                @* Ispisivanja statusa rezervacije *@
+                                @if (rezervacija.Rezervacija.Otkazana == 1)
+                                {
+                                    <span class="text-danger"><b>Otkazana</b></span>
+                                }
+                                else if (rezervacija.DanaDO.Days < 0)
+                                {
+                                    <span class="text-success"><b>Ispunjena</b></span>
+                                }
+                                else if (rezervacija.DanaDO.Days == 0)
+                                {
+                                    <span class="text-info"><b>Danas</b></span>
+                                }
+                                else
+                                {
+                                    <span class="text-primary"><b>Za @rezervacija.DanaDO.Days dana</b></span>
+                                }     
+                            </td>
+                            <td>
+                                <button class="btn btn-secondary @((rezervacija.Rezervacija.Otkazana == 1 || rezervacija.DanaDO.Days <= 0) ? "disabled" : "")" type="button" data-bs-toggle="modal" data-bs-target="#potvrdaOtkazivanja"
+                                        onclick="RezervacijaZaBrisanje('@(rezervacija.Rezervacija.BrLeta)', '@(rezervacija.Rezervacija.DatumPolaska)', '@(rezervacija.Rezervacija.IdKorisnika)');">
+                                    Otkaži
+                                </button>
+                            </td>
+                        </tr>
+                    }              
+                </table>
+            </div>
+    
+            <!-- Modal za potvrdu otkazivanja -->
+            <div class="modal fade" id="potvrdaOtkazivanja" tabindex="-1" aria-labelledby="potvrdaOtkazivanja" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="ModalLabel">Potvrdi brisanje</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Da li ste sigurni da želite da otkažete rezervaciju?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Nazad</button>
+                            <a class="btn btn-danger" href="" id="otkazi">Otkaži</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+@* Javascript *@
+@section Scripts
+{
+    <script src="~/js/adminActions.js"></script>
+}

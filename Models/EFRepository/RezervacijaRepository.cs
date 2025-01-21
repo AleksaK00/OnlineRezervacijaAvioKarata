@@ -39,6 +39,66 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
             rezervacijaEntities.SaveChanges();
         }
 
+        //Metoda za brisanje rezervacija korisnika, prvo brise relevantne naloge.
+        public void DeleteAllForUser(int id)
+        {
+            //Brisanje naloga
+            NalogRepository _nalogRepository = new NalogRepository();
+            _nalogRepository.DeleteAllForUser(id);
+
+            //Brisanje rezervacija
+            foreach (Rezervacija rezervacija in rezervacijaEntities.Rezervacijas.Where(r => r.IdKorisnika == id).Include(r => r.Sedistes).ToList())
+            {
+                //Prvo brisanje rezervisanih sedista
+                rezervacija.Sedistes.Clear();
+                rezervacijaEntities.Rezervacijas.Update(rezervacija);
+                rezervacijaEntities.SaveChanges();
+
+                rezervacijaEntities.Rezervacijas.Remove(rezervacija);
+                rezervacijaEntities.SaveChanges();
+            }
+        }
+
+        //Metoda koja vraca rezervacije zajedno sa korisnickim imenom
+        public IEnumerable<AdminPogledRezervacija> GetAllForAdmin()
+        {
+            List<AdminPogledRezervacija> rezervacije = new List<AdminPogledRezervacija>();
+
+            foreach(Rezervacija rezervacijeIzBaze in rezervacijaEntities.Rezervacijas.ToList())
+            {
+                //Stavljanje svih rezervacija u biznis objekat
+                RezervacijaBO rezervacijaBO = new RezervacijaBO()
+                {
+                    BrLeta = rezervacijeIzBaze.BrLeta,
+                    DatumPolaska = rezervacijeIzBaze.DatumPolaska,
+                    IcaoKod = rezervacijeIzBaze.IcaoKod,
+                    IdKorisnika = rezervacijeIzBaze.IdKorisnika,
+                    BrKarata = rezervacijeIzBaze.BrKarata,
+                    Klasa = rezervacijeIzBaze.Klasa,
+                    Otkazana = rezervacijeIzBaze.Otkazana,
+                    Ime = rezervacijeIzBaze.Ime,
+                    Prezime = rezervacijeIzBaze.Prezime,
+                    Adresa = rezervacijeIzBaze.Adresa,
+                };
+
+                //Racunanje dana do izvrsenja rezervacije i trazenje korisnickog imena
+                TimeSpan danaDO = rezervacijaBO.DatumPolaska.ToDateTime(TimeOnly.MinValue) - DateTime.Now;
+                Korisnik korisnik = rezervacijaEntities.Korisniks.Where(k => k.IdKorisnika == rezervacijaBO.IdKorisnika).FirstOrDefault();
+
+                //Konstrukcija admin pogled objekta
+                AdminPogledRezervacija rezervacija = new AdminPogledRezervacija()
+                {
+                    Rezervacija = rezervacijaBO,
+                    DanaDO = danaDO,
+                    KorisnickoIme = korisnik.KorisnickoIme
+                };
+
+                rezervacije.Add(rezervacija);
+            }
+
+            return rezervacije;
+        }
+
         //Metoda koja vraca rezervaciju na osnovu njenog primarnog kljuca
         public RezervacijaBO? GetReservation(string brLeta, DateOnly datumPolaska, int IDkorisnika)
         {

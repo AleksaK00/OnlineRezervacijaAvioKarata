@@ -282,5 +282,107 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
             rezervacijaEntities.Korisniks.Update(korisnikIzBaze);
             rezervacijaEntities.SaveChanges();
         }
+
+        //Metoda koja hvata sve regularne (tj nisu admini) korisnike
+        public IEnumerable<KorisnikBO> GetAllRegular()
+        {
+            List<KorisnikBO> korisnici = new List<KorisnikBO>();
+
+            foreach (Korisnik korisnik in rezervacijaEntities.Korisniks.Where(k => k.Administrator != 1).ToList())
+            {
+                KorisnikBO noviKorisnik = new KorisnikBO()
+                {
+                    IdKorisnika = korisnik.IdKorisnika,
+                    KorisnickoIme = korisnik.KorisnickoIme,
+                    Email = korisnik.Email,
+                    Ime = korisnik.Ime,
+                    Prezime = korisnik.Prezime,
+                    Adresa = korisnik.Adresa,
+                    IsDeleted = korisnik.IsDeleted,
+                };
+
+                korisnici.Add(noviKorisnik);
+            }
+
+            return korisnici;
+        }
+
+        //Hvata korisnika po id-u ukoliko postoji
+        public KorisnikBO? getByID(int id)
+        {
+            KorisnikBO korisnikBo = new KorisnikBO();
+
+            //Pretraga korisnika u bazi
+            Korisnik? korisnik = (from k in rezervacijaEntities.Korisniks
+                                  where k.IdKorisnika == id
+                                  select k).FirstOrDefault();
+
+            //Popunjavanje biznis objekta ukoliko korisnik postoji
+            if (korisnik == null)
+            {
+                return null;
+            }
+            else
+            {
+                korisnikBo.IdKorisnika = korisnik.IdKorisnika;
+                korisnikBo.KorisnickoIme = korisnik.KorisnickoIme;
+                korisnikBo.Email = korisnik.Email;
+                korisnikBo.Ime = korisnik.Ime;
+                korisnikBo.Prezime = korisnik.Prezime;
+                korisnikBo.Adresa = korisnik.Adresa;
+                korisnikBo.Administrator = korisnik.Administrator;
+                korisnikBo.PasswordResetToken = korisnik.PasswordResetToken;
+                korisnikBo.PasswordResetTimestamp = korisnik.PasswordResetTimestamp;
+                korisnikBo.IsDeleted = korisnik.IsDeleted;
+
+                return korisnikBo;
+            }
+        }
+
+        //Metoda vraca sve korisnike koje sadrze deo stringa
+        public IEnumerable<KorisnikBO> GetAllCointaining(string deoImena)
+        {
+            List<KorisnikBO> korisnici = new List<KorisnikBO>();
+
+            //Pretraga korisnika iz baze, case insesitive
+            foreach (Korisnik korisnik in rezervacijaEntities.Korisniks.Where(k => k.Administrator != 1 && k.KorisnickoIme.Contains(deoImena)).ToList())
+            {
+                //Dodavanje novog biznis objekta
+                KorisnikBO noviKorisnik = new KorisnikBO()
+                {
+                    IdKorisnika = korisnik.IdKorisnika,
+                    KorisnickoIme = korisnik.KorisnickoIme,
+                    Email = korisnik.Email,
+                    Ime = korisnik.Ime,
+                    Prezime = korisnik.Prezime,
+                    Adresa = korisnik.Adresa,
+                    IsDeleted = korisnik.IsDeleted,
+                };
+
+                korisnici.Add(noviKorisnik);
+            }
+
+            return korisnici;
+        }
+
+        //Metoda koja reaktivira nalog korisnika
+        public void ReactivateAccount(KorisnikBO korisnikBO)
+        {
+            Korisnik korisnikIzBaze = rezervacijaEntities.Korisniks.Where(k => k.IdKorisnika == korisnikBO.IdKorisnika).FirstOrDefault();
+
+            korisnikIzBaze.IsDeleted = null;
+
+            rezervacijaEntities.Korisniks.Update(korisnikIzBaze);
+            rezervacijaEntities.SaveChanges();
+        }
+
+        //Metoda za brisanje naloga
+        public void DeleteAccount(KorisnikBO korisnikBO)
+        {
+            Korisnik korisnikIzBaze = rezervacijaEntities.Korisniks.Where(k => k.IdKorisnika == korisnikBO.IdKorisnika).FirstOrDefault();
+
+            rezervacijaEntities.Korisniks.Remove(korisnikIzBaze);
+            rezervacijaEntities.SaveChanges();
+        }
     }
 }

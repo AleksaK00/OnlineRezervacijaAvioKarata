@@ -36,6 +36,14 @@ namespace OnlineRezervacijaAvioKarata.Controllers
         public IActionResult Index()
         {
             KorisnikBO korisnik = _korisnikRepository.getByUsername(HttpContext.Request.Cookies["Korisnik"]);
+
+            //Redirekcija na admin panel ako je korisnik administrator
+            if (korisnik.Administrator == 1)
+            {
+                return RedirectToAction("PregledKorisnika", "Admin");
+            }
+
+            //Hvatanje broja rezervacija za ispis
             List<RezervacijaBO> rezervacije = _rezervacijaRepository.getReservationsByUserID(korisnik.IdKorisnika).ToList();
             ViewBag.BrojRezervacija = rezervacije.Count;
 

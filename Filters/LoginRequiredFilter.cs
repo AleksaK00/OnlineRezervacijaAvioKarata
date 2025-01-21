@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace OnlineRezervacijaAvioKarata.Filters
 {
+    //Filter za proveru da li je korisnik ulogovan
     public class LoginRequiredFilter : IAuthorizationFilter
     {
         public void OnAuthorization(AuthorizationFilterContext context)

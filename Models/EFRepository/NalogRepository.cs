@@ -22,6 +22,15 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
             rezervacijaEntities.SaveChanges();
         }
 
+        public void DeleteAllForUser(int id)
+        {
+            foreach (Nalog nalog in rezervacijaEntities.Nalogs.Where(n => n.IdKorisnika == id).ToList())
+            {
+                rezervacijaEntities.Nalogs.Remove(nalog);
+            }
+            rezervacijaEntities.SaveChanges();
+        }
+
         //Metoda hvata nalog za placanje rezervacije
         public NalogBO? GetForReservation(RezervacijaBO rezervacijaBO)
         {

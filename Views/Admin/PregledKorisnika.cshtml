@@ -1,0 +1,119 @@
+﻿@model List<KorisnikBO>
+
+@{
+	ViewData["Title"] = "Pregled korisnika | ";
+}
+
+<section class="container">
+
+    @* Navigaciona traka *@
+    <partial name="NavigacijaAdmin"></partial>
+
+    <div class="row mt-3">
+        <div class="col-md-12 px-4 py-4 bg-white border border-primary rounded-3">
+
+            @* Searchbar *@
+            <div class="navbar bg-primary col-md-12 mt-1">
+
+                <div class="container-fluid">
+                    <form class="d-flex" name="formaPretraga" id="formaPretraga" asp-controller="Admin" asp-action="PretraziKorisnike">
+                        <input class="form-control me-2" name="pretragaPolje" type="search" placeholder="" aria-label="Pretraga">
+                        <button type="submit" class="btn btn-primary" name="pretraga">Pretraži</button>
+                    </form>
+                </div>
+            </div>
+
+            @* Ispisivanje gresaka unosa *@
+            @if (ViewData["Greska"] != null)
+            {
+                <div class="text-bg-danger text-center my-2 p-2 rounded-4">
+                    @ViewData["Greska"]
+                </div>
+            }
+    
+            @* Ispis Korisnika *@
+            <div class="table-responsive mt-4">
+                <table class="table table-hover align-middle">
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Korisnicko ime</th>
+                        <th></th>
+                        <th>email</th>
+                        <th>Ime</th>
+                        <th>Prezime</th>
+                        <th>Adresa</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+
+                    @foreach(KorisnikBO korisnik in Model)
+                    {
+                        <tr>
+                            <td>@korisnik.IdKorisnika</td>
+                            <td>
+                                @* Forma za promenu korisnickog imena, zajedno sa ispisom korisnickog imena *@
+                                <span id="korisnickoIme@(korisnik.IdKorisnika)" style="display: inline;">@korisnik.KorisnickoIme</span>
+                                <form asp-controller="Admin" asp-action="PromeniKorisnickoIme" asp-route-id="@korisnik.IdKorisnika">
+                                    <span id="poljeNovoKorisnickoIme@(korisnik.IdKorisnika)" style="display: none;">
+                                        <input type="text" class="form-control" name="novoKorisnickoIme">
+                                        <input type="submit" class="btn btn-sm btn-secondary text-center" value="Potvrdi">
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="OtkaziIzmenu('@(korisnik.IdKorisnika)');">Otkaži</button>
+                                    </span>
+                                </form>
+                            </td>
+                            <td><button class="btn btn-secondary ms-1" type="button" onclick="PrikaziIzmenu('@(korisnik.IdKorisnika)');">Izmeni</button></td>
+                            <td>@korisnik.Email</td>
+                            <td>@korisnik.Ime</td>
+                            <td>@korisnik.Prezime</td>
+                            <td>@korisnik.Adresa</td>
+                            @* Gasenje naloga dostupno ako nije ugasen, vracanje ako jeste, koristi modal za potvrdu *@
+                            <td>
+                                @if(korisnik.IsDeleted != 1)
+                                {
+                                    <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#potvrda"
+                                            onclick="KorisnikZaGasenje('@(korisnik.IdKorisnika)');">Ugasi</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#potvrda"
+                                            onclick="KorisnikZaVracanje('@(korisnik.IdKorisnika)');">Vrati</button>
+                                }
+                            </td>
+                            <td><button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#potvrda" 
+                                        onclick="KorisnikZaBrisanje('@(korisnik.IdKorisnika)');">Obriši</button>
+                            </td>
+                        </tr>
+                    }           
+                </table>
+            </div>
+    
+            @* Modal, link zavisi od pritisnutog dugmeta *@
+            <div class="modal fade" id="potvrda" tabindex="-1" aria-labelledby="potvrda" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="ModalLabel">Potvrdi brisanje</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="modalText">
+                            Da li ste sigurni?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Nazad</button>
+                            <a class="btn btn-danger" href="" id="dugmeModal"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+@* Javascript *@
+@section Scripts
+{
+    <script src="~/js/adminActions.js"></script>
+}

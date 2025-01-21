@@ -4,5 +4,6 @@
     {
         void Add(NalogBO nalogBO);
         NalogBO? GetForReservation(RezervacijaBO rezervacijaBO);
+        void DeleteAllForUser(int id);
     }
 }
