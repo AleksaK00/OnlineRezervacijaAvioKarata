@@ -69,6 +69,7 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
             return letovi;
         }
 
+        //Pronalazi minimalnu cenu od zakazanih letova
         public float? minimalnaCena(string brLeta)
         {
             List<InstancaLetum> instanceLeta = (from il in rezervacijaEntities.InstancaLeta
@@ -78,7 +79,14 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
             float? cenaOd = (float?)(from il in instanceLeta
                            select il.CenaEkonomija).Min();
 
-            return cenaOd;
+            if (cenaOd.HasValue)
+            {
+                return cenaOd;
+            }
+            else
+            {
+                return 0;
+            }
         }
     }
 }

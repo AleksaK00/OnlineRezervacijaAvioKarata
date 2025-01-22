@@ -45,7 +45,7 @@ function RezervacijaZaBrisanje(brLeta, datumPolaska, IDkorisnika)
 //Metoda za popunjavanje modala u slucaju klika na opciju obrisi promociju
 function PromocijaZaBrisanje(ID)
 {
-    document.getElementById('dugmeModal').href = '/admin/promos/delete/' + ID;
+    document.getElementById('dugmeModal').href = '/Admin/ObrisiPromociju/' + ID;
     document.getElementById('dugmeModal').innerHTML = 'Obriši';
     document.getElementById('dugmeModal').className = 'btn btn-danger';
 }

@@ -146,7 +146,7 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
             korisnik.Ime = noviKorisnik.Ime;
             korisnik.Prezime = noviKorisnik.Prezime;
             korisnik.Adresa = noviKorisnik.Adresa;
-            korisnik.Administrator = 0;
+            korisnik.Administrator = noviKorisnik.Administrator;
             korisnik.PasswordResetToken = null;
             korisnik.PasswordResetTimestamp = null;
             korisnik.IsDeleted = null;

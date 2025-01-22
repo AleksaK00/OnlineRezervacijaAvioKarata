@@ -101,6 +101,7 @@ namespace OnlineRezervacijaAvioKarata.Controllers
             noviKorisnik.Ime = podaci["name"];
             noviKorisnik.Prezime = podaci["surname"];
             noviKorisnik.Adresa = podaci["address"];
+            noviKorisnik.Administrator = 0;
 
             _korisnikRepository.add(noviKorisnik, podaci["password"]);
 
