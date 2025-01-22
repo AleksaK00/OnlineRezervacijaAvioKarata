@@ -157,7 +157,7 @@ namespace OnlineRezervacijaAvioKarata.Controllers
                 case "Ekonomija": 
                     ViewBag.Cena = instancaLeta.CenaEkonomija;
                     break;
-                case "PremiumEkonomija":
+                case "Premium_Ekonomija":
                     ViewBag.Cena = instancaLeta.CenaPremiumEkonomija;
                     break;
                 case "Biznis":
