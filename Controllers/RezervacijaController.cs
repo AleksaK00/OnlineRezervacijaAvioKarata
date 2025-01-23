@@ -173,6 +173,8 @@ namespace OnlineRezervacijaAvioKarata.Controllers
             //Format za ispisivanje cene
             CultureInfo culture = new CultureInfo("fr-FR");
             ViewBag.Culture = culture;
+            CultureInfo cultureDecimal = new CultureInfo("en-US");
+            ViewBag.CultureDecimal = cultureDecimal;
 
             return View("OdabirKlase", instancaLeta);
         }

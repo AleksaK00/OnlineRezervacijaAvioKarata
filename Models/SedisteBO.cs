@@ -8,7 +8,7 @@
 
         public string Klasa { get; set; } = null!;
 
-        public double? Doplata { get; set; }
+        public double Doplata { get; set; }
 
         public virtual AvionBO RegistracijaNavigation { get; set; } = null!;
     }

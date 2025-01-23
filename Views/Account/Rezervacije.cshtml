@@ -63,7 +63,7 @@
                                     }
                                 </td>
                                 <td><button class="btn btn-secondary @((rezervacija.Rezervacija.Otkazana == 1 || rezervacija.DanaDO.Days <= 0) ? "disabled" : "")" type="button" data-bs-toggle="modal" data-bs-target="#potvrdaOtkazivanja"
-                                            onclick="RezervacijaZaBrisanje('@(rezervacija.Rezervacija.BrLeta)', '@(rezervacija.Rezervacija.DatumPolaska)');">
+                                            onclick="RezervacijaZaBrisanje('@(rezervacija.Rezervacija.BrLeta)', '@(rezervacija.Rezervacija.DatumPolaska.ToString("yyyy-MM-dd"))');">
                                         Otkaži
                                     </button>
                                 </td>

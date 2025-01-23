@@ -194,7 +194,7 @@ namespace OnlineRezervacijaAvioKarata.Models.EFRepository
                 novoSediste.BrSedista = nerezervisanoSediste.BrSedista;
                 novoSediste.Registracija = nerezervisanoSediste.Registracija;
                 novoSediste.Klasa = nerezervisanoSediste.Klasa;
-                novoSediste.Doplata = nerezervisanoSediste.Doplata;
+                novoSediste.Doplata = (double)nerezervisanoSediste.Doplata;
 
                 nerezervisanaSedista.Add(novoSediste);
             }

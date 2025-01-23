@@ -34,7 +34,7 @@
                                 <td>@Convert.ToDouble(let.CenaEkonomija).ToString("C", ViewBag.Culture)</td>
                                 <td>@(let.CenaPremiumEkonomija > 0 ? Convert.ToDouble(let.CenaPremiumEkonomija).ToString("C", ViewBag.Culture) : "Nije Dostupna")</td>
                                 <td>@(let.CenaBiznis > 0 ? Convert.ToDouble(let.CenaBiznis).ToString("C", ViewBag.Culture) : "Nije Dostupna")</td>
-                                <td><a class="btn btn-secondary btn-md" asp-controller="Rezervacija" asp-action="OdaberiKlasu" asp-route-brLeta="@let.BrLeta" asp-route-datumPolaska="@let.DatumPolaska">Izaberi</a></td>
+                                <td><a class="btn btn-secondary btn-md" asp-controller="Rezervacija" asp-action="OdaberiKlasu" asp-route-brLeta="@let.BrLeta" asp-route-datumPolaska="@let.DatumPolaska.ToString("yyyy-MM-dd")">Izaberi</a></td>
                             </tr>
                             }
                         </tbody>

@@ -17,7 +17,7 @@
             <div class="row justify-content-center">
                 <div class="col-md-6"> 
 
-                    <form asp-controller="Rezervacija" asp-action="PrikaziPotvrduRezervacije" asp-route-brLeta="@ViewBag.SideNavData.BrLeta" asp-route-datumPolaska="@ViewBag.SideNavData.DatumPolaska" asp-route-klasa="@ViewBag.SideNavData.Klasa">
+                    <form asp-controller="Rezervacija" asp-action="PrikaziPotvrduRezervacije" asp-route-brLeta="@ViewBag.SideNavData.BrLeta" asp-route-datumPolaska="@ViewBag.SideNavData.DatumPolaska.ToString("yyyy-MM-dd")" asp-route-klasa="@ViewBag.SideNavData.Klasa">
                         <div class="mb-3">
                             <label for="ime" class="form-label">Ime</label>
                             <input type="text" class="form-control" id="ime" name="ime" value="@Model.Ime"/>

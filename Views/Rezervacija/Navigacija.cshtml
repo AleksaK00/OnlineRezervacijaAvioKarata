@@ -13,17 +13,17 @@
                            asp-controller="Rezervacija" asp-action="IzaberiLet" asp-route-id="@Model.BrLeta">Datum polaska</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link fs-4 @((Context.Request.Path == ("/Rezervacija/OdaberiKlasu/" + Model.BrLeta + "/" + Model.DatumPolaska) || Context.Request.Path == ("/Rezervacija/OdabirKarata/" + Model.BrLeta + "/" + Model.DatumPolaska + "/" + Model.Klasa)) ? "rounded-3 active" : "")
+                        <a class="nav-link fs-4 @((Context.Request.Path == ("/Rezervacija/OdaberiKlasu/" + Model.BrLeta + "/" + Model.DatumPolaska.ToString("yyyy-MM-dd")) || Context.Request.Path == ("/Rezervacija/OdabirKarata/" + Model.BrLeta + "/" + Model.DatumPolaska.ToString("yyyy-MM-dd") + "/" + Model.Klasa)) ? "rounded-3 active" : "")
                            @((Model.Korak < 2) ? "disabled" : "")"
-                           asp-controller="Rezervacija" asp-action="OdaberiKlasu" asp-route-brLeta="@Model.BrLeta" asp-route-datumPolaska="@Model.DatumPolaska">Klasa i sedište</a>
+                           asp-controller="Rezervacija" asp-action="OdaberiKlasu" asp-route-brLeta="@Model.BrLeta" asp-route-datumPolaska="@Model.DatumPolaska.ToString("yyyy-MM-dd")">Klasa i sedište</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link fs-4 @((Context.Request.Path == ("/Rezervacija/IspisInformacija/" + Model.BrLeta + "/" + Model.DatumPolaska + "/" + Model.Klasa)) ? "rounded-3 active" : "")
+                        <a class="nav-link fs-4 @((Context.Request.Path == ("/Rezervacija/IspisInformacija/" + Model.BrLeta + "/" + Model.DatumPolaska.ToString("yyyy-MM-dd") + "/" + Model.Klasa)) ? "rounded-3 active" : "")
                            @((Model.Korak < 3) ? "disabled" : "")"
-                           asp-controller="Rezervacija" asp-action="IspisInformacija" asp-route-brLeta="@Model.BrLeta" asp-route-datumPolaska="@Model.DatumPolaska" asp-route-klasa="@Model.Klasa">Unos informacija</a>
+                           asp-controller="Rezervacija" asp-action="IspisInformacija" asp-route-brLeta="@Model.BrLeta" asp-route-datumPolaska="@Model.DatumPolaska.ToString("yyyy-MM-dd")" asp-route-klasa="@Model.Klasa">Unos informacija</a>
                     </li>
                     <li class="nav-item">
-                        <div class="nav-link fs-4 @((Context.Request.Path == ("/Rezervacija/PrikaziPotvrduRezervacije/" + Model.BrLeta + "/" + Model.DatumPolaska + "/" + Model.Klasa)) ? "rounded-3 active" : "")
+                        <div class="nav-link fs-4 @((Context.Request.Path == ("/Rezervacija/PrikaziPotvrduRezervacije/" + Model.BrLeta + "/" + Model.DatumPolaska.ToString("yyyy-MM-dd") + "/" + Model.Klasa)) ? "rounded-3 active" : "")
                              @((Model.Korak < 4) ? "disabled" : "")">Potvrda</div>
                     </li>
                 </ul>

@@ -22,8 +22,8 @@
                 <div class="row border-top border-primary py-4 px-2 m-4">
 
                     @* Korisnik bira broj karata, max 5, a zatim mu se prikazuje opcija za rezervaciju sedista, i to onoliko select-ova koliko je izabrao karata *@
-                    <div class="col-md-8 mt-5" id="odabir" data-Cena = "@ViewBag.Cena">
-                        <form asp-controller="Rezervacija" asp-action="IspisInformacija" asp-route-brLeta="@Model.BrLeta" asp-route-datumPolaska="@Model.DatumPolaska" asp-route-klasa="@ViewBag.Klasa">
+                    <div class="col-md-8 mt-5" id="odabir" data-Cena="@ViewBag.Cena.ToString("F", ViewBag.CultureDecimal)">
+                        <form asp-controller="Rezervacija" asp-action="IspisInformacija" asp-route-brLeta="@Model.BrLeta" asp-route-datumPolaska="@Model.DatumPolaska.ToString("yyyy-MM-dd")" asp-route-klasa="@ViewBag.Klasa">
                             <div class="row justify-content-center">
                                 <div class="col-md-12 text-center">
 
@@ -46,7 +46,7 @@
                                                         {
                                                             @if (sediste.Klasa == ViewBag.Klasa)
                                                             {
-                                                                <option value="@sediste.BrSedista" data-Doplata="@sediste.Doplata">@sediste.BrSedista</option>
+                                                                <option value="@sediste.BrSedista" data-Doplata="@sediste.Doplata.ToString("F", ViewBag.CultureDecimal)">@sediste.BrSedista</option>
                                                             }
                                                         }
                                                     </select>
