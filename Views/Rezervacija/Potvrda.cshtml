@@ -43,7 +43,7 @@
                         <td>@((Convert.ToDouble(Context.Session.GetString("CenaKarte")) * Convert.ToInt32(Context.Session.GetString("BrKarata"))).ToString("C", ViewBag.Culture))</td>
                     </tr>
                     <tr>
-                        <td class="text-primary">Izabrana Sedista: </td>
+                        <td class="text-primary">Izabrana Sedišta: </td>
                         <td>
                             @foreach (var sediste in ViewBag.Sedista)
                             {

@@ -242,7 +242,7 @@ namespace OnlineRezervacijaAvioKarata.Controllers
             //Validacija da li su polja uneta i vracanje greske ako nisu
             if (String.IsNullOrEmpty(podaci["ime"]) || String.IsNullOrEmpty(podaci["prezime"]) || String.IsNullOrEmpty(podaci["adresa"]))
             {
-                return RedirectToAction("IspisInformacija", new { brLeta = brLeta, datumPolaska = datumPolaska, klasa = klasa, greska = "Sva polja su obavezna!" });
+                return RedirectToAction("IspisInformacija", new { brLeta = brLeta, datumPolaska = datumPolaska.ToString("yyyy-MM-dd"), klasa = klasa, greska = "Sva polja su obavezna!" });
             }
 
             //Skladistenje podataka iz forme za ispis
